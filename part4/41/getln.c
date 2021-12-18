@@ -1,7 +1,7 @@
 #include <stdio.h>
 /*получает строки из ввода*/
 
-int getline(char s[], int lim)
+int getln(char s[], int lim)
 {
   int c, i;
   i = 0;

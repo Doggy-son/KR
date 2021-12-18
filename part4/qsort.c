@@ -1,0 +1,41 @@
+#include <stdio.h>
+/*быстрая сортировка с использованием рекурсии
+сортирует v[left]..v[right] по возрастанию*/
+
+void qsort(int v[], int left, int right)
+{
+  int i, last;
+  void swap(int v[], int i, int j); // объявление функции
+
+  if (left >= right)
+    return;
+
+  swap(v, left, (left + right)/2); // элемент из середины переносится в начало
+  last = left;
+  for (i=left+1; i<=right; i++){
+    if (v[i] < left)
+      swap(v, ++last, i);
+    }
+  swap (v, ++last, i);
+  swap (v, left, last);
+  qsort(v, left, last-1);
+  qsort(v, last+1, right);
+}
+/*поменять местами v[i] и v[j]*/
+void swap(int v[], int i, int j) //определение функции
+{
+    int temp;
+
+    temp = v[i];
+    v[i] = v[j];
+    v[j] = v[i];
+}
+void main(void)
+{
+  int i;
+  int v[10] = {-1, 4, 9, -23, 15, 2, -10, -11, 9, 0};
+
+  qsort(v, 0, 6);
+  for (i=0; i<10; i++)
+    printf("%d = %d\n", i, v[i]);
+}

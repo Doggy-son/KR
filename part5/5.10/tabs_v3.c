@@ -5,6 +5,7 @@
 
 #define LINESIZE 100
 #define TABSIZE 4
+#define STOPPERIOD 10  //расстояние между стопами по умолчанию
 
 /*detab - заменяет tab на пробелы. до ближайшего стопа*/
 void detab (char *s, int *stops, int size_stops, long size_s);
@@ -16,24 +17,23 @@ void setstops (int argc, char *argv[], int *stops);
 void main(int argc, char *argv[])
 {
     char *s; // для хранения строк из ввода
-    int stops[argc-1]; //для хранения стопов
+    int stops[LINESIZE]; //для хранения стопов
     size_t ssize = LINESIZE;
-    s = (char *)malloc(LINESIZE * sizeof(char));
+    s = (char *)malloc(ssize * sizeof(char));
     long len_s;
     int i = 0;
 
-    
-
     setstops (argc, argv, stops);
-    while (i < (argc-1)){
-        printf("main : stops = %d \n", *(stops+i));
+    while (i < LINESIZE){
+        if (stops[i] == 1)
+            printf("main : stops on position %d \n", i);
         i++;
     }
 
     while((len_s = getline(&s, &ssize, stdin)) != -1){
         printf("main: get line s = %s, len_s = %ld\n", s, len_s);
-        detab(s, stops, argc-1, len_s);
-        entab(s, stops, argc-1, len_s);
+        detab(s, stops, LINESIZE-1, len_s);
+        entab(s, stops, LINESIZE-1, len_s);
     }
 }
 /*ищет соседа справа для x в отсортированном массиве*/
@@ -92,13 +92,12 @@ void detab (char *s, int *stops, int size_stops, long size_s)
 }
 int search_next (int x, int v[], int size)
 {
-    int i = 0;
+    int i;
 
-    while (i < size){
-        if (v[i] >= x)
+    for (i=x; i < size; i++)
+        if (v[i] == 1)
             return i;
-        i++;
-    }
+
     return -1;
 }
 
@@ -106,36 +105,42 @@ int search_next (int x, int v[], int size)
 void insertion_sort(int *v, int size);
 void swap(int i, int j, int *v);
 
+/*при обращении вида entab-m+n "стопы" табуляции начинаются с m-й позиции
+ и выполняются через каждые n позиций. Если аргументы не переданы,
+ используются значения по умолчанию*/
 void setstops(int argc, char *argv[], int *stops)
 {
-    int size = argc - 1;
-    int *begin = stops;
+    int i, m, n;
 
-    while (--argc > 0)
-    {
-        *(stops++) = atoi(*(++argv));
+    for (i=0; i<LINESIZE; i++)
+        stops[i] = 0;
+
+    if (argc == 1){
+        for (i=STOPPERIOD; i<LINESIZE; i+=STOPPERIOD)
+            stops[i] = 1;
     }
-    /*сортировка массива*/
-    insertion_sort(begin, size);
-}
-void insertion_sort(int *v, int size)
-{
-    int i, j, temp;
-
-    for (i=1; i<size; i++){
-        for (j=0; j<i; j++)
-            if (*(v+i) < *(v+j)){
-                while (j<=i)
-                    swap(i, j++, v);
-                break;
-            }
+    else if ((*++argv)[0] == '-' ){
+        m = atoi(&(*argv)[1]);
+        n = atoi(&(*++argv)[1]);
+        if (*argv[0]!='+' || n==0 || m==0){
+            printf("setstops: неправильно заданы аргументы\n");
+            return;
         }
-}
-void swap(int i, int j, int *v)
-{
-    int temp;
+        for (i=m; i<LINESIZE; i+=n)
+            stops[i] = 1;
+    }
+    else {
+        int i;
 
-    temp = *(v+i);
-    *(v+i) = *(v+j);
-    *(v+j) = temp;
+        while (--argc > 0)
+        {
+            i = atoi(*argv++);
+            printf("i = %d\n", i);
+            if (i==0){
+                printf("setstops: неправильно заданы аргументы\n");
+                return;
+            }
+            stops[i] = 1;
+        }
+    }
 }

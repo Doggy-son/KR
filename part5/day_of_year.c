@@ -2,6 +2,7 @@
 
 static char daytab[2][13] = {{0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},
                              {0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}};
+
 /*определяет номер дня в году*/
 int day_of_year(int year, int month, int day)
 {
@@ -36,14 +37,16 @@ int month_day(int year, int yearday, int *pmonth, int *pday)
 
   return 0;
 }
+char *get_month_name(int n)
+{
+  static char *month_name[] = {
+                                 "NoName", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                                 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+                            };
+
+  return (n<1 || n>12) ? month_name[0] : month_name[n];
+}
 void main()
 {
-  int m;
-  int d;
-
-  int a = day_of_year(2020, 1, 12);
-  printf("%d\n", a);
-
-  month_day(2021, 15, &m, &d);
-  printf("%d, %d\n", m, d);
+  printf("%s, %s\n", get_month_name(-9), get_month_name(5));
 }

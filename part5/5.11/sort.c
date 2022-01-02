@@ -1,33 +1,52 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "header.h"
 
 void swap(void *v[], int a, int b);
 
 /*функция сортирует массив*/
-void q_sort (void *v[], int left, int right, int (*comp)(void *a, void *b), char a[5])
+void q_sort (void *v[], int left, int right, int (*comp)(void *a, void *b),
+             int option, int pos1, int pos2 )
 {
-    int last, i, asc;
+    int last, i, n, r, f, d, k;
+    char *s1 = (char *)malloc(LINESIZE * sizeof(char));
+    char *s2 = (char *)malloc(LINESIZE * sizeof(char));
 
     if (left >= right)
         return;
 
-    if (strcmp(a, "desc") == 0)
-        asc = -1;
-    else
-        asc = 1; // по умолчанию сортировка в порядке возрастания
-
-    swap (v, left, (left+right)/2);
+    n = option%2;
+    k = option/2;
+    r = k%2;
+    k = k/2;
+    f = k%2;
+    k = k/2;
+    d = k%2;
     last = left;
 
-    for (i=left+1; i<=right; i++)
-        if ((*comp)(v[i], v[left])*asc < 0 )
+    for (i=left+1; i<=right; i++){
+        if (pos2==0)
+            pos2 = LINESIZE;
+        strcpy(s1, substr(v[i], pos1, pos2));
+        printf("sort: s1 = %s\n", s1);
+        strcpy(s2, substr(v[left], pos1, pos2));
+        printf("sort: s2 = %s\n", s2);
+        if (f){
+            to_lower(s1);
+            to_lower(s2);
+        }
+        if (d){
+            to_alphanum(s1);
+            to_alphanum(s2);
+        }
+        if ((*comp)(s1, s2)*(r ? -1 : 1) < 0 )//если r=0, сортировка desc
             swap (v, ++last, i);
+        }
     swap (v, left, last);
 
-
-    q_sort (v, left, last-1, comp, a);
-    q_sort (v, last+1, right, comp, a);
+    q_sort (v, left, last-1, comp, option, pos1, pos2);
+    q_sort (v, last+1, right, comp, option, pos1, pos2);
 }
 void swap(void *v[], int a, int b)
 {
@@ -55,11 +74,10 @@ int numcmp(void *a, void *b)
 // test
 /*void main ()
 {
-    char *a[] = {"abc", "def", "a", "zxy"};
+    char *a[] = {"&abc", "def", "+a", ">  zxy"};
 
-    q_sort((void **)a, 0, 3, (int (*)(void*, void*))(strcmp), "desc");
+    q_sort((void **)a, 0, 3, (int (*)(void*, void*))(strcmp), 15, 0, 0);
 
     for (int i=0; i<4; i++)
         printf(" %s ", (char *)a[i]);
-}
-*/
+}*/

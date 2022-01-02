@@ -5,5 +5,9 @@ char *strpointers[LINESCNT]; // массив указателей на стро�
 char *alloc(long n);
 int readlines(char *strpointers[], int maxlines);
 void writelines(char *strpointers[], int nlines);
-void q_sort(void *v[], int left, int right, int (*comp)(void *a, void *b), char a[5]);
+void q_sort(void *v[], int left, int right,
+            int (*comp)(void *a, void *b), int option, int pos1, int pos2);
 int numcmp(void *a, void *b);
+void to_lower(char *s);
+void to_alphanum(char *s);
+char *substr(char *s, int pos1, int pos2);
